@@ -13,7 +13,7 @@
 #define ir A1              // According to SharpIR.h library we must define the type of IR sensor we are using. A1 = 
 #define model 1080
 
-Servo ServoMotor;
+Servo ServoMotor;          // Define ServoMotor variable as Type Servo. 
 
 
 int CountN = 0;            // Count how long the obeject remains in front of sensor. Variable use to determine whether 
@@ -130,9 +130,9 @@ void loop() {
       
 
       CountN = 0; // reset timer time
-      countLCD = countLCD + 1; // Count the number of time sensor is triggered
-      lcd.begin (16, 2); 
-      lcd.print(countLCD);
+      countLCD = countLCD + 1; // Count the number of time sensor is triggered. Not Needed
+      lcd.begin (16, 2);       // Tell where to use on LCD. Not Needed
+      lcd.print(countLCD);     // Display value of countLCD on the LCD screen. Not Needed
       delay(30000); // 5min Delay Flush. Won’t scare pets if they are playing near toilet 
     
     // Initiate Flush. 
