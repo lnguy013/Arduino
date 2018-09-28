@@ -4,43 +4,58 @@
   */
 
 //Global Constant 
-#include <LiquidCrystal.h> // Library import from Elegoo
-#include <Servo.h>         // Library import from Arduino
+#include <LiquidCrystal.h> // Library import from Elegoo. Import LCD library so we can use LCD feature. Not needed.
+#include <Servo.h>         // Library import from Arduino. Import Servo Library so we can use Serve feature.
 #include <SharpIR.h>       // Library import from http://robojax.com/learn/arduino 
                            // This Library for IR sensor might not be needed
                            // Code update will convert the signal to distance value later.
-#define ir A1
+
+#define ir A1              // According to SharpIR.h library we must define the type of IR sensor we are using. A1 = 
 #define model 1080
 
 Servo ServoMotor;
 
 
-int CountN = 0; // Count how long the obeject remains in front of sensor
-int countLCD = 0; // Count the ammount of time object trigger the sensor code
-int HArray [25]={}; // Declare Array to compare sensor value
-int dst = 0;
+int CountN = 0;            // Count how long the obeject remains in front of sensor. Variable use to determine whether 
+                           // or Not the user triggered the sensor on purpose or just walking by. Prevent False trigger.
 
-LiquidCrystal lcd (12, 11, 5, 4, 3, 2);
-SharpIR SharpIR(ir,model);
+int countLCD = 0;          // Count the ammount of time object trigger the sensor code. Variable use to determine how many
+						   // time the Flush was triggered. Not needed if use don't intend to keep track using LCD.
 
+int HArray [25]={};        // Declare Array to compare sensor value. Array, of 25 memory slots, 
+                           // used to store a sample of 25 values. 
+
+int dst = 0;               // Declare integer dst for distance. Variable used to store current IR measured distance.
+
+
+LiquidCrystal lcd (12, 11, 5, 4, 3, 2);  // Initializing the LCD. Indicating PIN on the Arduino board we 
+										 // are using. Not Needed.
+
+SharpIR SharpIR(ir,model);               // Initializing IR sensor. Indicating Model and sample rate we are using.
+
+
+
+//This code in setup will only run once.
 void setup() {
 
-  Serial.begin(9600); // start Serial communication: at 9600 baurate
-
-
+  Serial.begin(9600);       // start Serial communication: at 9600 baurate. This is for Debuging. 
+  							// Initialize a console for user to see. Not Needed.
+  
   // inital PIN 10
-  ServoMotor.attach(10); // initialize on PIN 10 so the servo don’t draw power
-  ServoMotor.write(0);   // servo on cause false IR Sensor reading.
-  delay(100);
+  ServoMotor.attach(10);    // initialize on PIN 10 so the servo don’t draw power.
+                            // servo on cause false IR Sensor reading.
+  
+  ServoMotor.write(0);      // Turn Server motor off by inputing 0 in to the value
+  delay(100);               // wait about 100 milsec before going on to start the next line of code.
 
 
 }
 
 void loop() {
 
- dst=SharpIR.distance();
- dst=(dst/2.54);
- HArray[0] = dst;
+ dst=SharpIR.distance();    // Start the Sharp IR sensor. Equation is provided in the IR library. The value is equal to dst.
+ dst=(dst/2.54);            // Conversion from cm to inches
+ HArray[0] = dst;           // Store dst value into slot 1 of the HArray Array for comparison later.
 	
 	// Due to inaccuracy of the Sharp IR sensor I have decided to use this logic
 	/* Logic here is: We will take 24 samples sensor value and we will pick the
