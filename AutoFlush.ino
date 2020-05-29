@@ -27,6 +27,11 @@ int HArray [25]={};        // Declare Array to compare sensor value. Array, of 2
 
 int dst = 0;               // Declare integer dst for distance. Variable used to store current IR measured distance.
 
+int s = 0;
+int s2 = 0;
+int m = 0;
+int m2 =0;
+
 
 LiquidCrystal lcd (12, 11, 5, 4, 3, 2);  // Initializing the LCD. Indicating PIN on the Arduino board we 
 										 // are using. Not Needed.
@@ -47,6 +52,11 @@ void setup() {
   
   ServoMotor.write(0);      // Turn Server motor off by inputing 0 in to the value
   delay(100);               // wait about 100 milsec before going on to start the next line of code.
+	
+  // LCD display setup
+  lcd.begin (16, 2); //
+  lcd.setCursor(0,0);      // pointer to start LCD print at row 1 column 1
+  lcd.print("Used: ");     // print Usded: to LCD screen (using column 0-5)
 
 
 }
@@ -98,6 +108,25 @@ void loop() {
 
  dst = HArray[24]; // Setting Distance to the last value, which should be the highest.
  
+ // Setup LCD to show current IR measurement 
+ lcd.setCursor(9,0);
+ lcd.print("Dst:");
+ if (dst >= 10){
+ lcd.setCursor(13,0);
+ lcd.print(dst);
+ lcd.print(15,0);
+ lcd.print(" ");
+ }
+ else{
+ lcd.setCursor(13,0);
+ lcd.print("0");
+ lcd.setCursor(14,0);
+ lcd.print(dst);
+ lcd.setCursor(15,0);
+ lcd.print(" ");
+ }
+	
+	
  // Lower for serial port to check the value. Keep code just in case need to debug.
  Serial.print(dst);
  Serial.print(", Distance");
@@ -128,13 +157,61 @@ void loop() {
     
     if (CountN >=15 ){
       
-
+      s = 0;
+      s2 = 0;
+      m = 0;
+      m2 =0;
       CountN = 0; // reset timer time
       countLCD = countLCD + 1; // Count the number of time sensor is triggered. Not Needed
+      
+      // LCD setup for number of usages
+      lcd.setCursor(6,0);
+      lcd.print(countLCD);   
+	    
+      // LCD setup to indicated we are in flushing mode. Replace IR distances with "fsh"
+      lcd.setCursor(13,0);
+      lcd.print("fsh");
+	    
+      // clear row 2 for display
+      lcd.setCursor(0,1);
+      lcd.print("");
+      
+	    
+      // For loop to replay delay. created time counter to know how long until flush will happen.
+     for (long n = 1500000L ; n >=0L ; n--) // n will be the timer count => roughly 1 minute and 5 second replace n value to get longer timer
+      {
+        if (n%23077 == 0){ // roughly every 23077 is a second, count up 1 second on LCD display
+          s++;
+          if (s == 10){ // if second is more than 10 count second tenth place up once and reduce s to 0
+            s = 0;
+            s2++;
+            if(s2 == 6){ // convert 60 second to 1 minute
+              m++;
+              s2=0;
+              if(m == 10){
+                m2++;
+                m=0;
+              }
+            }}
+            ///Serial.println("Check for Loop");
+            lcd.setCursor(0,1);
+            lcd.print(m2); // Print tenth place of minute
+            lcd.setCursor(1,1);
+            lcd.print(m); // print minute
+            lcd.setCursor(2,1);
+            lcd.print(":");
+            lcd.setCursor(3,1);
+            lcd.print(s2); // print tenth place of second
+            lcd.setCursor(4,1);
+            lcd.print(s); // print second
+            lcd.setCursor(0,1);
+        }
+      }/**/
+     /*  Remove this code replacing with a for loop 
       lcd.begin (16, 2);       // Tell where to use on LCD. Not Needed
       lcd.print(countLCD);     // Display value of countLCD on the LCD screen. Not Needed
       delay(30000); // 5min Delay Flush. Won’t scare pets if they are playing near toilet 
-    
+     /**/
     // Initiate Flush. 
       ServoMotor.attach(9); // initialize on PIN 9 to power the servo motor
       ServoMotor.write(90); // Pull Lever up to start flush
