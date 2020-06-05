@@ -40,12 +40,7 @@ void setup() {
   pinMode(Pin2, OUTPUT);  
   pinMode(Pin3, OUTPUT);  
   pinMode(Pin4, OUTPUT);  
-  // inital PIN 10
-  //ServoMotor.attach(10); //Initialized the Signal for Servo to be On then. 
-  //ServoMotor.write(0); //Keep it zero on 10. This way the Motor won't power on 
-  //delay(100);          //Servo Motor being on draws too much power from the board
-                       //Will cause IR sensor measurement to drop by 80-40 inches
-                       //Keep Signal Pin on 10 to start prevent the draw in power from servo
+  
 
    lcd.begin (16, 2); //
    lcd.setCursor(0,0);
@@ -54,10 +49,7 @@ void setup() {
    lcd.print("M");
    lcd.setCursor(15,1);
    lcd.print(wait);
-  /*Serial.print(CountN);
-  Serial.print(", CheckA");
-  Serial.println();
-  delay(100);*/
+  
 }
 
 void loop() {
@@ -65,88 +57,31 @@ void loop() {
  //unsigned long startTime=millis();
  dst=SharpIR.distance();
  dst=(dst/2.54);
-/* Serial.print(dst);
- Serial.print(", CheckPoint1");
- Serial.println();
- delay(100);*/
+
  HArray[0] = dst;
 
 
 for (int ArraySlot = 1; ArraySlot < 25; ArraySlot++){
- /*Serial.print(HArray[ArraySlot-1]);
- Serial.print(", CheckPoint2");
- Serial.println();
- delay(100);*/
-  
+
   dst = SharpIR.distance();
   dst = (dst/2.54);
- /*Serial.print(HArray[ArraySlot]);
- Serial.print(", CheckPoint2-a");
- Serial.println();
- Serial.println();
- delay(100);*/
-
- HArray[ArraySlot] = dst;
-
- /*Serial.print(HArray[ArraySlot]);
- Serial.print(", CheckPoint2-b");
- Serial.println();
- delay(100);
- Serial.print(HArray[ArraySlot-1]);
- Serial.print(", CheckPoint2-c");
- Serial.println();
- delay(100);*/
  
-if (HArray[ArraySlot-1] <= HArray[ArraySlot]){
- /*Serial.print(HArray[ArraySlot]);
- Serial.print(", Current3-a");
- Serial.println();
- delay(100);
- Serial.print(HArray[ArraySlot-1]);
- Serial.print(", Previous3-b");
- Serial.println();
- delay(100);
-  /*HArray[ArraySlot] = dst;*/
-  HArray[ArraySlot] = HArray[ArraySlot];
-  /*Serial.print(HArray[ArraySlot-1]);
- Serial.print(", CheckPoint3-c");
- Serial.println();
- delay(100);
- Serial.print(HArray[ArraySlot]);
- Serial.print(", StoreCurrent3-d");
- Serial.println();
- delay(100);*/
-}
-else{
- /*Serial.print(HArray[ArraySlot]);
-   Serial.print(", Current4-a");
-   Serial.println();
-   delay(100);
-   Serial.print(HArray[ArraySlot-1]);
-   Serial.print(", Previous-b");
-   Serial.println();
-   delay(100);*/
-  HArray[ArraySlot] = HArray[ArraySlot-1];
-   /*Serial.print(HArray[ArraySlot]);
-   Serial.print(", StorePrevious4-c");
-   Serial.println();
-   delay(100);
-   Serial.print(HArray[ArraySlot-1]);
-   Serial.print(", CheckPoint4-d");
-   Serial.println();
-   delay(100);*/
 
+  HArray[ArraySlot] = dst;
+
+ 
+  if (HArray[ArraySlot-1] <= HArray[ArraySlot]){
+ 
+   HArray[ArraySlot] = HArray[ArraySlot];
+ 
+  }
+  else{
+ 
+   HArray[ArraySlot] = HArray[ArraySlot-1];
+
+ }
 }
 
-/*Serial.print(ArraySlot);
- Serial.print(", Array Number");
- Serial.println();
-Serial.println();
- delay(100);*/
-}
-
- //unsigned long calcTime=millis()-startTime;
- //long SensorValue = analogRead(A1);
  dst = HArray[24];
 
 
@@ -172,8 +107,15 @@ Serial.println();
  Serial.println();
  Serial.print("Change Value: ");
  Serial.println(changeMode);
+
+ /*Here I want to reset Change Mode value back to zero after a certain ammount of time of inactivity.
+   Need to prevent this changing mode if user did not intend to change them.
+  */
+  
+ /*Current issue is Reset doesn't alway equal to 0 after ever 2000 ms due to code delays
+   Not sure how to do this better*/ //HELP////
  Serial.print("Time: ");
- Reset = millis()%2000;
+ Reset = millis()%2000; 
  Serial.print(Reset);
     // after inactivity clear change mode to prevent switching to new mode over time
    if (Reset >= 0 && Reset <= 10)
@@ -184,15 +126,13 @@ Serial.println();
      changeMode = 0;
     }
    }
- //Serial.print(SensorValue);*/
+  
+  // End of Need Help 
+
  Serial.println();
  Serial.println();
  delay(100);
- //SensorValue = 0;
- //CountN = 0;
- /*Serial.print(CountN);
- Serial.print(", CheckPoint-5");
- Serial.println();*/
+ 
 
  
  // Trigger Event to wait if user is within 13 inches of the sensor
@@ -208,11 +148,7 @@ Serial.println();
     delay(100);/**/
   }
   else{
-    //digitalWrite (6, LOW); // Light for Visual during checking
-    /*Serial.print(CountN);
-    Serial.print(", CheckPoint-7");
-    Serial.println();
-    delay(100);*/
+
     // If link break after certain count we trigger next event
     // Flush will occur
     // Reset counter for next event
@@ -280,11 +216,10 @@ Serial.println();
       }/**/
       
 
-      //delay(300000L); // Delay Flush so won't scare Cat
+      
     
     // Initiate Flush. 
-      //ServoMotor.attach(9); // Initialize the Servo signal to PIN 9 to start up Motor only when needed
-      //ServoMotor.write(120); // Pull Lever up to start flush
+    
       lcd.setCursor(13,0);
       lcd.print("Pus");
       Serial.println("Begin");
