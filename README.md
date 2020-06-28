@@ -1,3 +1,5 @@
 # Arduino
 Arduino - Elegoo Hobby project
-# Integrating Arduino into daily life
+- Learning coding and embedded system through Arduino 
+- Incorporates Arduino system into random hobby project.
+
